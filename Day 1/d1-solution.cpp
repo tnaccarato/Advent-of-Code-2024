@@ -6,14 +6,12 @@
 
 using namespace std;
 
-
-static tuple<vector<int>, vector<int>> read_columns_from_file(const string& fileName) {
-    /*
-        * Read two columns from a file and return them as vectors
-        * @param fileName: The name of the file to read from
-        * @return: A tuple containing two vectors of integers
-    */
-
+/*
+    * Read two columns from a file and return them as vectors
+    * @param fileName: The name of the file to read from
+    * @return: A tuple containing two vectors of integers
+*/
+static tuple<vector<int>, vector<int> > read_columns_from_file(const string &fileName) {
     // Initialise columns
     vector<int> column1;
     vector<int> column2;
@@ -41,15 +39,12 @@ static tuple<vector<int>, vector<int>> read_columns_from_file(const string& file
     return {column1, column2};
 }
 
-int calculate_distance_sum(const string& file_name = "input.txt") {
-    /*
-        * Calculate the sum of the absolute differences between the columns
-        * @param file_name: The name of the file to read from
-        * @return: The sum of the absolute differences between the columns
-    */
-
-    auto [column1, column2] = read_columns_from_file(file_name);
-
+/*
+     * Calculate the sum of the absolute differences between the columns
+     * @param file_name: The name of the file to read from
+     * @return: The sum of the absolute differences between the columns
+ */
+int calculate_distance_sum(vector<int> column1, vector<int> column2) {
     // Sort the columns in descending order
     sort(column1.begin(), column1.end(), greater<>());
     sort(column2.begin(), column2.end(), greater<>());
@@ -67,8 +62,39 @@ int calculate_distance_sum(const string& file_name = "input.txt") {
     return distance_sum;
 }
 
-// Define the main function globally
+/*
+    * Calculate the similarity score by adding up the product of the value in column1 and the frequency of the value
+    * in column2
+    * @param file_name: The name of the file to read from
+    * @return: The similarity score
+*/
+int calculate_similarity_score(const vector<int> &column1, const vector<int> &column2) {
+    // Initialise a hash map to store the frequency of values in column2
+    unordered_map<int, int> frequency_map;
+
+    // Loop through column2 and store the frequency of each value in the hash map
+    for (int value: column2) {
+        frequency_map[value]++;
+    }
+
+    // Initialise the similarity score
+    int similarity_score = 0;
+
+    // if the value in column1 is in column2, add the product of the value in column1 and the frequency of the value
+    // in column2 to the similarity score
+    for (int value: column1) {
+        if (frequency_map.find(value) != frequency_map.end()) {
+            similarity_score += value * frequency_map[value];
+        }
+    }
+
+    return similarity_score;
+}
+
 int main() {
-    cout << calculate_distance_sum() << endl;
+    const string file_name = "input.txt";
+    auto [column1, column2] = read_columns_from_file(file_name);
+    cout << calculate_distance_sum(column1, column2) << endl;
+    cout << calculate_similarity_score(column1, column2) << endl;
     return 0;
 }
