@@ -6,46 +6,49 @@
 
 using namespace std;
 
-class Solution {
-  public:
-    static tuple<vector<int>, vector<int>> read_columns_from_file(const string& fileName) {
-        /*
-            * Read two columns from a file and return them as vectors
-            * @param fileName: The name of the file to read from
-            * @return: A tuple containing two vectors of integers
-        */
 
-        // Initialise columns
-        vector<int> column1;
-        vector<int> column2;
+static tuple<vector<int>, vector<int>> read_columns_from_file(const string& fileName) {
+    /*
+        * Read two columns from a file and return them as vectors
+        * @param fileName: The name of the file to read from
+        * @return: A tuple containing two vectors of integers
+    */
 
-        // Open the file
-        ifstream inputFile(fileName);
+    // Initialise columns
+    vector<int> column1;
+    vector<int> column2;
 
-        // Handle file opening error
-        if (!inputFile) {
-            cerr << "Error: Unable to open the file!" << endl;
-            return {column1, column2};
-        }
+    // Open the file
+    ifstream inputFile(fileName);
 
-        // Assign temporary variables to store the columns
-        int num1, num2;
-        // Push the columns into the vectors
-        while (inputFile >> num1 >> num2) {
-            column1.push_back(num1);
-            column2.push_back(num2);
-        }
-
-        inputFile.close();
-
-        // Return tuple of the columns
+    // Handle file opening error
+    if (!inputFile) {
+        cerr << "Error: Unable to open the file!" << endl;
         return {column1, column2};
     }
-};
 
-// Define the main function globally
-int main() {
-    auto [column1, column2] = Solution::read_columns_from_file("input.txt");
+    // Assign temporary variables to store the columns
+    int num1, num2;
+    // Push the columns into the vectors
+    while (inputFile >> num1 >> num2) {
+        column1.push_back(num1);
+        column2.push_back(num2);
+    }
+
+    inputFile.close();
+
+    // Return tuple of the columns
+    return {column1, column2};
+}
+
+int calculate_distance_sum(const string& file_name = "input.txt") {
+    /*
+        * Calculate the sum of the absolute differences between the columns
+        * @param file_name: The name of the file to read from
+        * @return: The sum of the absolute differences between the columns
+    */
+
+    auto [column1, column2] = read_columns_from_file(file_name);
 
     // Sort the columns in descending order
     sort(column1.begin(), column1.end(), greater<>());
@@ -61,7 +64,11 @@ int main() {
         column2.pop_back();
     }
 
-    cout << "Sum of distances: " << distance_sum << endl;
+    return distance_sum;
+}
 
+// Define the main function globally
+int main() {
+    cout << calculate_distance_sum() << endl;
     return 0;
 }
