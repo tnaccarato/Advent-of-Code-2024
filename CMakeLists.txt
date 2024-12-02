@@ -5,3 +5,4 @@ set(CMAKE_CXX_STANDARD 17)
 
 # Add a subdirectory for each day's solution
 add_subdirectory(Day\ 1)
+add_subdirectory(Day\ 2)
