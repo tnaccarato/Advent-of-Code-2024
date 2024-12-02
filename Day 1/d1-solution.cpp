@@ -92,7 +92,7 @@ int calculate_similarity_score(const vector<int> &column1, const vector<int> &co
 }
 
 int main() {
-    const string file_name = "input.txt";
+    const string file_name = INPUT_FILE_PATH;
     auto [column1, column2] = read_columns_from_file(file_name);
     cout << calculate_distance_sum(column1, column2) << endl;
     cout << calculate_similarity_score(column1, column2) << endl;
