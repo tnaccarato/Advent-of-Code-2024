@@ -47,6 +47,11 @@ static vector<vector<int>> read_lines_from_file(const string &fileName) {
     return lines;
 }
 
+/*
+ * Check if a report is safe by checking the difference between each element
+ * @param report: The report to check
+ * @return: True if the report is safe, false otherwise
+ */
 bool is_report_safe(const vector<int>& report) {
     // Get report size
     size_t reportSize = report.size();
@@ -71,25 +76,41 @@ bool is_report_safe(const vector<int>& report) {
     }
 
     return increasing || decreasing;
+    }
 
+/* Check if report is safe allowing for a single element to be removed
+ * @param report: The report to check
+ * @return: True if the report is safe, false otherwise
+ */
+bool is_report_safe_with_dampener(const vector<int>& report) {
+    if (is_report_safe(report)) return true; // Already safe
 
+    size_t reportSize = report.size();
 
+    // Try removing each level and check if the rest is safe
+    for (size_t i = 0; i < reportSize; i++) {
+        vector<int> modifiedReport;
+        for (size_t j = 0; j < reportSize; j++) {
+            if (j != i) modifiedReport.push_back(report[j]); // Skip level i
+        }
+        if (is_report_safe(modifiedReport)) return true; // Safe if removal works
+    }
 
-
-
+    return false; // Unsafe if no removal makes it safe
 }
 
-
-
-
-
 int main(){
-    string fileName = INPUT_FILE_PATH;
+    const string fileName = INPUT_FILE_PATH;
     vector<vector<int>> reports = read_lines_from_file(fileName);
     int safeReports = 0;
+    // for (const vector<int>& report: reports) {
+    //     if (is_report_safe(report)) safeReports++;
+    // }
+    // cout << "Safe reports: " << safeReports << endl;
+    safeReports = 0;
     for (const vector<int>& report: reports) {
-        if (is_report_safe(report)) safeReports++;
+        if (is_report_safe_with_dampener(report)) safeReports++;
     }
-    cout << "Safe reports: " << safeReports << endl;
+    cout << "Safe reports with tolerance: " << safeReports << endl;
     return 0;
 }
