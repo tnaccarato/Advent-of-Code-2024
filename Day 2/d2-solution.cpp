@@ -103,10 +103,10 @@ int main(){
     const string fileName = INPUT_FILE_PATH;
     vector<vector<int>> reports = read_lines_from_file(fileName);
     int safeReports = 0;
-    // for (const vector<int>& report: reports) {
-    //     if (is_report_safe(report)) safeReports++;
-    // }
-    // cout << "Safe reports: " << safeReports << endl;
+    for (const vector<int>& report: reports) {
+        if (is_report_safe(report)) safeReports++;
+    }
+    cout << "Safe reports: " << safeReports << endl;
     safeReports = 0;
     for (const vector<int>& report: reports) {
         if (is_report_safe_with_dampener(report)) safeReports++;
