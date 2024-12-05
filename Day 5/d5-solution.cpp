@@ -55,6 +55,23 @@ bool readInputFile(const string& filename, vector<string>& orderingRulesLines, v
 }
 
 /**
+ * @brief Parses a line representing an update sequence into a vector of integers.
+ *
+ * @param updateLine The string representing the update sequence.
+ * @return A vector of integers representing the parsed update sequence.
+ */
+vector<int> parseUpdateLine(const string& updateLine) {
+    istringstream iss(updateLine);
+    vector<int> update;
+    int page;
+    while (iss >> page) {
+        update.push_back(page);
+        if (iss.peek() == ',') iss.ignore(); // Ignore the comma separator.
+    }
+    return update;
+}
+
+/**
  * @brief Checks if an update sequence is in the correct order according to the given ordering rules.
  *
  * @param update A vector of integers representing the page update sequence.
@@ -83,37 +100,30 @@ bool isCorrectOrder(const vector<int>& update, const unordered_map<int, unordere
 }
 
 /**
- * @brief Gets the middle element from the update sequence.
- *
- * @param update A vector of integers representing the page update sequence.
- * @return The middle element of the update sequence.
- */
-int getMiddleElement(const vector<int>& update) {
-    return update[update.size() / 2];
-}
-
-
-/**
- * @brief Sums the middle pages of the update sequences that follow the ordering rules.
+ * @brief Sums the middle pages of update sequences based on their validity.
  *
  * @param updatesLines The vector of strings representing the update sequences.
  * @param orderingRules The <int, unordered_set<int>> map representing the ordering rules.
- * @return Integer representing the sum of the middle pages of the update sequences that follow the ordering rules.
+ * @param requireCorrectOrder Boolean flag indicating whether to consider only correctly ordered sequences.
+ * @return Integer representing the sum of the middle pages.
  */
-int sumMiddlePages(vector<string> updatesLines, unordered_map<int, unordered_set<int>> orderingRules) {
+int sumMiddlePages(const vector<string>& updatesLines, const unordered_map<int, unordered_set<int>>& orderingRules, bool requireCorrectOrder) {
     int sum = 0;
     for (const string& updateLine : updatesLines) {
-        istringstream iss(updateLine);
-        vector<int> update;
-        int page;
-        while (iss >> page) {
-            update.push_back(page);
-            if (iss.peek() == ',') iss.ignore(); // Ignore the comma separator.
-        }
+        vector<int> update = parseUpdateLine(updateLine);
+        bool isOrdered = isCorrectOrder(update, orderingRules);
 
-        // If the update sequence is in the correct order, add its middle element to the sum.
-        if (isCorrectOrder(update, orderingRules)) {
-            sum += getMiddleElement(update);
+        if (requireCorrectOrder && isOrdered) {
+            sum += update[update.size() / 2];
+        } else if (!requireCorrectOrder && !isOrdered) {
+            sort(update.begin(), update.end(), [&orderingRules](int a, int b) {
+                // Custom comparator to ensure correct order based on rules.
+                if (orderingRules.find(a) != orderingRules.end() && orderingRules.at(a).count(b)) {
+                    return true; // a must come before b according to the ordering rules.
+                }
+                return false; // Otherwise, maintain default order.
+            });
+            sum += update[update.size() / 2];
         }
     }
     return sum;
@@ -135,12 +145,12 @@ int main() {
     unordered_map<int, unordered_set<int>> orderingRules;
     parseOrderingRules(orderingRulesLines, orderingRules);
 
-    // Parse updates and check order
-    int sumOfMiddlePages = sumMiddlePages(updatesLines, orderingRules);
+    // Calculate sums
+    int sumOfMiddlePages = sumMiddlePages(updatesLines, orderingRules, true);
+    cout << "Sum of correct update middle pages: " << sumOfMiddlePages << endl;
 
-
-    // Output the result
-    cout << "Sum of middle pages: " << sumOfMiddlePages << endl;
+    int sumOfCorrectedMiddlePages = sumMiddlePages(updatesLines, orderingRules, false);
+    cout << "Sum of corrected update middle pages: " << sumOfCorrectedMiddlePages << endl;
 
     return 0;
 }
